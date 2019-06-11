@@ -19,14 +19,21 @@ const LOGIN_MUTATION = gql`
   }
 `
 
+// FIXME: graphql type generation
+type AuthPayload = {
+  [key in 'login' | 'signup']: {
+    token: string
+  }
+}
+
 export const Login = ({ history }: RouteComponentProps) => {
   const [login, setLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
 
-  const confirm = (data: { login: string } & { signup: string }) => {
-    const token = login ? data.login : data.signup
+  const confirm = (data: AuthPayload) => {
+    const { token } = login ? data.login : data.signup
 
     localStorage.setItem('auth-token', token)
 

@@ -2,7 +2,6 @@ import React from 'react'
 import { Query } from 'react-apollo'
 import gql from 'graphql-tag'
 import { Link } from 'components/Link'
-import { Link as TLink } from 'types'
 
 const FEED_QUERY = gql`
   {
@@ -12,6 +11,16 @@ const FEED_QUERY = gql`
         createdAt
         url
         description
+        postedBy {
+          id
+          name
+        }
+        votes {
+          id
+          user {
+            id
+          }
+        }
       }
     }
   }
@@ -20,7 +29,7 @@ const FEED_QUERY = gql`
 type RenderProps = {
   data: {
     feed: {
-      links: TLink[]
+      links: any[] // FIXME: graphql type generation
     }
   }
   error?: unknown
@@ -40,8 +49,8 @@ export const LinkList = () => (
 
       return (
         <>
-          {data.feed.links.map(link => (
-            <Link key={link.id} link={link} />
+          {data.feed.links.map((link, index) => (
+            <Link key={link.id} link={link} index={index} />
           ))}
         </>
       )
