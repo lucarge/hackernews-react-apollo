@@ -1,50 +1,22 @@
 import React from 'react'
 import { Query } from 'react-apollo'
-import gql from 'graphql-tag'
+import { FEED_QUERY } from 'api/queries/feed'
 import { Link } from 'components/Link'
-
-const FEED_QUERY = gql`
-  {
-    feed {
-      links {
-        id
-        createdAt
-        url
-        description
-        postedBy {
-          id
-          name
-        }
-        votes {
-          id
-          user {
-            id
-          }
-        }
-      }
-    }
-  }
-`
-
-type RenderProps = {
-  data: {
-    feed: {
-      links: any[] // FIXME: graphql type generation
-    }
-  }
-  error?: unknown
-  loading: boolean
-}
+import { Feed } from 'types'
 
 export const LinkList = () => (
-  <Query query={FEED_QUERY}>
-    {({ data, error, loading }: RenderProps) => {
+  <Query<Feed> query={FEED_QUERY}>
+    {({ data, error, loading }) => {
       if (loading) {
         return <div>Loading</div>
       }
 
       if (error) {
         return <div>Error</div>
+      }
+
+      if (!data) {
+        return null
       }
 
       return (

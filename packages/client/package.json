@@ -3,10 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@types/jest": "24.0.13",
-    "@types/node": "12.0.7",
-    "@types/react": "16.8.19",
-    "@types/react-dom": "16.8.4",
     "apollo-boost": "0.4.2",
     "apollo-link-context": "1.0.17",
     "graphql": "14.3.1",
@@ -22,7 +18,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "types:generate": "apollo codegen:generate --config=apollo.config.js --globalTypesFile=src/types/index.ts --outputFlat --target=typescript src/types/index.ts"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -40,7 +37,13 @@
     ]
   },
   "devDependencies": {
+    "@types/graphql": "14.2.0",
+    "@types/jest": "24.0.13",
+    "@types/node": "12.0.7",
+    "@types/react": "16.8.19",
+    "@types/react-dom": "16.8.4",
     "@types/react-router": "5.0.1",
-    "@types/react-router-dom": "4.3.3"
+    "@types/react-router-dom": "4.3.3",
+    "apollo": "2.13.1"
   }
 }
