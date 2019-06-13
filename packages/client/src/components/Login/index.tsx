@@ -1,29 +1,18 @@
-import React, { useState } from 'react'
-import gql from 'graphql-tag'
-import { Mutation, MutationFn } from 'react-apollo'
+import React, { useCallback, useState } from 'react'
+import { Mutation } from 'react-apollo'
 import { RouteComponentProps } from 'react-router'
+import { LOGIN_MUTATION } from 'api/mutations/login'
+import { SIGNUP_MUTATION } from 'api/mutations/signup'
+import { LoginMutation, LoginMutationVariables, SignupMutation, SignupMutationVariables } from 'types'
 
-const SIGNUP_MUTATION = gql`
-  mutation SignupMutation($email: String!, $password: String!, $name: String!) {
-    signup(email: $email, password: $password, name: $name) {
-      token
-    }
-  }
-`
+const isLogin = (data: LoginMutation | SignupMutation): data is LoginMutation => Object.keys(data).includes('login')
 
-const LOGIN_MUTATION = gql`
-  mutation LoginMutation($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
-      token
-    }
+const getToken = (data: LoginMutation | SignupMutation) => {
+  if (isLogin(data)) {
+    return data.login ? data.login.token : undefined
   }
-`
 
-// FIXME: graphql type generation
-type AuthPayload = {
-  [key in 'login' | 'signup']: {
-    token: string
-  }
+  return data.signup ? data.signup.token : undefined
 }
 
 export const Login = ({ history }: RouteComponentProps) => {
@@ -32,13 +21,20 @@ export const Login = ({ history }: RouteComponentProps) => {
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
 
-  const confirm = (data: AuthPayload) => {
-    const { token } = login ? data.login : data.signup
+  const confirm = useCallback(
+    (data: LoginMutation | SignupMutation) => {
+      const token = getToken(data)
 
-    localStorage.setItem('auth-token', token)
+      if (!token) {
+        return
+      }
 
-    history.push('/')
-  }
+      localStorage.setItem('auth-token', token)
+
+      history.push('/')
+    },
+    [history]
+  )
 
   return (
     <div>
@@ -54,12 +50,12 @@ export const Login = ({ history }: RouteComponentProps) => {
         />
       </div>
       <div className="flex mt3">
-        <Mutation
+        <Mutation<LoginMutation | SignupMutation, LoginMutationVariables | SignupMutationVariables>
           mutation={login ? LOGIN_MUTATION : SIGNUP_MUTATION}
           variables={{ email, password, name }}
           onCompleted={confirm}
         >
-          {(mutation: MutationFn) => (
+          {mutation => (
             <div className="pointer mr2 button" onClick={() => mutation()}>
               {login ? 'login' : 'create account'}
             </div>

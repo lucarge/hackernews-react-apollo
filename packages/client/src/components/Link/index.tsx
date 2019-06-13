@@ -1,31 +1,13 @@
 import React from 'react'
-import gql from 'graphql-tag'
-import { Mutation, MutationFn } from 'react-apollo'
+import { Mutation } from 'react-apollo'
+import { VOTE_MUTATION } from 'api/mutations/vote'
+import { Feed_feed_links, VoteMutation, VoteMutationVariables } from 'types'
 import { timeDifferenceForDate } from 'utils/timeDifferenceForDate'
 
 type Props = {
   index: number
-  link: any // FIXME: graphql types generation
+  link: Feed_feed_links
 }
-
-const VOTE_MUTATION = gql`
-  mutation VoteMutation($linkId: ID!) {
-    vote(linkId: $linkId) {
-      id
-      link {
-        votes {
-          id
-          user {
-            id
-          }
-        }
-      }
-      user {
-        id
-      }
-    }
-  }
-`
 
 export const Link = ({ index, link }: Props) => {
   const authToken = localStorage.getItem('auth-token')
@@ -35,8 +17,8 @@ export const Link = ({ index, link }: Props) => {
       <div className="flex items-center">
         <span className="gray">{index + 1}.</span>
         {authToken && (
-          <Mutation mutation={VOTE_MUTATION} variables={{ linkId: link.id }}>
-            {(voteMutation: MutationFn) => (
+          <Mutation<VoteMutation, VoteMutationVariables> mutation={VOTE_MUTATION} variables={{ linkId: link.id }}>
+            {voteMutation => (
               <button className="ml1 gray f11" onClick={() => voteMutation()}>
                 ▲
               </button>

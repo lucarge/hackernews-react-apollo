@@ -1,13 +1,13 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { Link, withRouter, RouteComponentProps } from 'react-router-dom'
 
 const HeaderComponent = ({ history }: RouteComponentProps) => {
   const authToken = localStorage.getItem('auth-token')
 
-  const onLogout = () => {
+  const onLogout = useCallback(() => {
     localStorage.removeItem('auth-token')
     history.push('/')
-  }
+  }, [history])
 
   return (
     <div className="flex pa1 justify-between nowrap orange">

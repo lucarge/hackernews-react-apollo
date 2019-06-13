@@ -1,22 +1,16 @@
-import React, { useState } from 'react'
-import { Mutation, MutationFn } from 'react-apollo'
-import gql from 'graphql-tag'
+import React, { useCallback, useState } from 'react'
+import { Mutation } from 'react-apollo'
 import { RouteComponentProps } from 'react-router'
-
-const POST_MUTATION = gql`
-  mutation PostMutation($description: String!, $url: String!) {
-    post(description: $description, url: $url) {
-      id
-      createdAt
-      url
-      description
-    }
-  }
-`
+import { POST_MUTATION } from 'api/mutations/post'
+import { PostMutation, PostMutationVariables } from 'types'
 
 export const CreateLink = ({ history }: RouteComponentProps) => {
   const [description, setDescription] = useState('')
   const [url, setUrl] = useState('')
+
+  const handleCompleted = useCallback(() => {
+    history.push('/')
+  }, [history])
 
   return (
     <div>
@@ -36,8 +30,12 @@ export const CreateLink = ({ history }: RouteComponentProps) => {
           placeholder="The URL for the link"
         />
       </div>
-      <Mutation mutation={POST_MUTATION} onCompleted={() => history.push('/')} variables={{ description, url }}>
-        {(postMutation: MutationFn) => <button onClick={() => postMutation()}>Submit</button>}
+      <Mutation<PostMutation, PostMutationVariables>
+        mutation={POST_MUTATION}
+        onCompleted={handleCompleted}
+        variables={{ description, url }}
+      >
+        {postMutation => <button onClick={() => postMutation()}>Submit</button>}
       </Mutation>
     </div>
   )

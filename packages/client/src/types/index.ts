@@ -3,6 +3,120 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL mutation operation: LoginMutation
+// ====================================================
+
+export interface LoginMutation_login {
+  __typename: 'AuthPayload'
+  token: string | null
+}
+
+export interface LoginMutation {
+  login: LoginMutation_login | null
+}
+
+export interface LoginMutationVariables {
+  email: string
+  password: string
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL mutation operation: PostMutation
+// ====================================================
+
+export interface PostMutation_post {
+  __typename: 'Link'
+  id: string
+  createdAt: any
+  url: string
+  description: string
+}
+
+export interface PostMutation {
+  post: PostMutation_post
+}
+
+export interface PostMutationVariables {
+  description: string
+  url: string
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL mutation operation: SignupMutation
+// ====================================================
+
+export interface SignupMutation_signup {
+  __typename: 'AuthPayload'
+  token: string | null
+}
+
+export interface SignupMutation {
+  signup: SignupMutation_signup | null
+}
+
+export interface SignupMutationVariables {
+  email: string
+  password: string
+  name: string
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL mutation operation: VoteMutation
+// ====================================================
+
+export interface VoteMutation_vote_link_votes_user {
+  __typename: 'User'
+  id: string
+}
+
+export interface VoteMutation_vote_link_votes {
+  __typename: 'Vote'
+  id: string
+  user: VoteMutation_vote_link_votes_user
+}
+
+export interface VoteMutation_vote_link {
+  __typename: 'Link'
+  votes: VoteMutation_vote_link_votes[]
+}
+
+export interface VoteMutation_vote_user {
+  __typename: 'User'
+  id: string
+}
+
+export interface VoteMutation_vote {
+  __typename: 'Vote'
+  id: string
+  link: VoteMutation_vote_link
+  user: VoteMutation_vote_user
+}
+
+export interface VoteMutation {
+  vote: VoteMutation_vote
+}
+
+export interface VoteMutationVariables {
+  linkId: string
+}
+
+/* tslint:disable */
+/* eslint-disable */
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: Feed
 // ====================================================
 
