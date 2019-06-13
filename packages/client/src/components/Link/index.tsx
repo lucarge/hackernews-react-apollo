@@ -1,7 +1,8 @@
-import React from 'react'
-import { Mutation } from 'react-apollo'
+import React, { useCallback } from 'react'
+import { Mutation, MutationUpdaterFn } from 'react-apollo'
 import { VOTE_MUTATION } from 'api/mutations/vote'
-import { Feed_feed_links, VoteMutation, VoteMutationVariables } from 'types'
+import { FEED_QUERY } from 'api/queries/feed'
+import { Feed, Feed_feed_links, VoteMutation, VoteMutationVariables } from 'types'
 import { timeDifferenceForDate } from 'utils/timeDifferenceForDate'
 
 type Props = {
@@ -12,12 +13,52 @@ type Props = {
 export const Link = ({ index, link }: Props) => {
   const authToken = localStorage.getItem('auth-token')
 
+  const handleCacheUpdate: MutationUpdaterFn<VoteMutation> = useCallback(
+    (store, payload) => {
+      const vote = payload.data ? payload.data.vote : undefined
+
+      if (!vote) {
+        return
+      }
+
+      const data = store.readQuery<Feed>({ query: FEED_QUERY })
+
+      if (!data) {
+        return
+      }
+
+      store.writeQuery({
+        query: FEED_QUERY,
+        data: {
+          feed: {
+            ...data.feed,
+            links: data.feed.links.map(currentLink => {
+              if (currentLink.id !== link.id) {
+                return currentLink
+              }
+
+              return {
+                ...currentLink,
+                votes: vote.link.votes,
+              }
+            }),
+          },
+        },
+      })
+    },
+    [link]
+  )
+
   return (
     <div className="flex mt2 items-start">
       <div className="flex items-center">
         <span className="gray">{index + 1}.</span>
         {authToken && (
-          <Mutation<VoteMutation, VoteMutationVariables> mutation={VOTE_MUTATION} variables={{ linkId: link.id }}>
+          <Mutation<VoteMutation, VoteMutationVariables>
+            mutation={VOTE_MUTATION}
+            update={handleCacheUpdate}
+            variables={{ linkId: link.id }}
+          >
             {voteMutation => (
               <button className="ml1 gray f11" onClick={() => voteMutation()}>
                 ▲

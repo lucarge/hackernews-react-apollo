@@ -1,8 +1,9 @@
 import React, { useCallback, useState } from 'react'
-import { Mutation } from 'react-apollo'
+import { Mutation, MutationUpdaterFn } from 'react-apollo'
 import { RouteComponentProps } from 'react-router'
+import { FEED_QUERY } from 'api/queries/feed'
 import { POST_MUTATION } from 'api/mutations/post'
-import { PostMutation, PostMutationVariables } from 'types'
+import { PostMutation, PostMutationVariables, Feed } from 'types'
 
 export const CreateLink = ({ history }: RouteComponentProps) => {
   const [description, setDescription] = useState('')
@@ -11,6 +12,30 @@ export const CreateLink = ({ history }: RouteComponentProps) => {
   const handleCompleted = useCallback(() => {
     history.push('/')
   }, [history])
+
+  const handleUpdate: MutationUpdaterFn<PostMutation> = useCallback((store, payload) => {
+    const post = payload.data ? payload.data.post : undefined
+
+    if (!post) {
+      return
+    }
+
+    const data = store.readQuery<Feed>({ query: FEED_QUERY })
+
+    if (!data) {
+      return
+    }
+
+    store.writeQuery({
+      query: FEED_QUERY,
+      data: {
+        feed: {
+          ...data.feed,
+          links: [post, ...data.feed.links],
+        },
+      },
+    })
+  }, [])
 
   return (
     <div>
@@ -33,6 +58,7 @@ export const CreateLink = ({ history }: RouteComponentProps) => {
       <Mutation<PostMutation, PostMutationVariables>
         mutation={POST_MUTATION}
         onCompleted={handleCompleted}
+        update={handleUpdate}
         variables={{ description, url }}
       >
         {postMutation => <button onClick={() => postMutation()}>Submit</button>}
