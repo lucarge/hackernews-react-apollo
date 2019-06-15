@@ -3,9 +3,10 @@ import { Mutation, MutationUpdaterFn } from 'react-apollo'
 import { RouteComponentProps } from 'react-router'
 import { FEED_QUERY } from 'api/queries/feed'
 import { POST_MUTATION } from 'api/mutations/post'
-import { PostMutation, PostMutationVariables, Feed } from 'types'
+import { PostMutation, PostMutationVariables, FeedQuery } from 'types'
+import { getFeedQueryVariables } from 'utils/getFeedQueryVariables'
 
-export const CreateLink = ({ history }: RouteComponentProps) => {
+export const CreateLink = ({ history, location, match }: RouteComponentProps<{ page: string }>) => {
   const [description, setDescription] = useState('')
   const [url, setUrl] = useState('')
 
@@ -13,29 +14,36 @@ export const CreateLink = ({ history }: RouteComponentProps) => {
     history.push('/')
   }, [history])
 
-  const handleUpdate: MutationUpdaterFn<PostMutation> = useCallback((store, payload) => {
-    const post = payload.data ? payload.data.post : undefined
+  const handleUpdate: MutationUpdaterFn<PostMutation> = useCallback(
+    (store, payload) => {
+      const post = payload.data ? payload.data.post : undefined
 
-    if (!post) {
-      return
-    }
+      if (!post) {
+        return
+      }
 
-    const data = store.readQuery<Feed>({ query: FEED_QUERY })
+      const data = store.readQuery<FeedQuery>({
+        query: FEED_QUERY,
+        variables: getFeedQueryVariables(location, match),
+      })
 
-    if (!data) {
-      return
-    }
+      if (!data) {
+        return
+      }
 
-    store.writeQuery({
-      query: FEED_QUERY,
-      data: {
-        feed: {
-          ...data.feed,
-          links: [post, ...data.feed.links],
+      store.writeQuery({
+        data: {
+          feed: {
+            ...data.feed,
+            links: [post, ...data.feed.links],
+          },
         },
-      },
-    })
-  }, [])
+        query: FEED_QUERY,
+        variables: getFeedQueryVariables(location, match),
+      })
+    },
+    [location, match]
+  )
 
   return (
     <div>

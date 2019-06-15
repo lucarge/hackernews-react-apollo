@@ -1,16 +1,18 @@
 import React, { useCallback } from 'react'
 import { Mutation, MutationUpdaterFn } from 'react-apollo'
+import { RouteComponentProps, withRouter } from 'react-router'
 import { VOTE_MUTATION } from 'api/mutations/vote'
 import { FEED_QUERY } from 'api/queries/feed'
-import { Feed, Feed_feed_links, VoteMutation, VoteMutationVariables } from 'types'
+import { FeedQuery, FeedQuery_feed_links, VoteMutation, VoteMutationVariables } from 'types'
+import { getFeedQueryVariables } from 'utils/getFeedQueryVariables'
 import { timeDifferenceForDate } from 'utils/timeDifferenceForDate'
 
-type Props = {
+type Props = RouteComponentProps<{ page: string }> & {
   index: number
-  link: Feed_feed_links
+  link: FeedQuery_feed_links
 }
 
-export const Link = ({ index, link }: Props) => {
+const LinkComponent = ({ index, location, match, link }: Props) => {
   const authToken = localStorage.getItem('auth-token')
 
   const handleCacheUpdate: MutationUpdaterFn<VoteMutation> = useCallback(
@@ -21,7 +23,10 @@ export const Link = ({ index, link }: Props) => {
         return
       }
 
-      const data = store.readQuery<Feed>({ query: FEED_QUERY })
+      const data = store.readQuery<FeedQuery>({
+        query: FEED_QUERY,
+        variables: getFeedQueryVariables(location, match),
+      })
 
       if (!data) {
         return
@@ -46,7 +51,7 @@ export const Link = ({ index, link }: Props) => {
         },
       })
     },
-    [link]
+    [link, location, match]
   )
 
   return (
@@ -79,5 +84,7 @@ export const Link = ({ index, link }: Props) => {
     </div>
   )
 }
+
+export const Link = withRouter(LinkComponent)
 
 export default undefined

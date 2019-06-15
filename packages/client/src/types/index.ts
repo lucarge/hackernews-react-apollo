@@ -117,43 +117,50 @@ export interface VoteMutationVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: Feed
+// GraphQL query operation: FeedQuery
 // ====================================================
 
-export interface Feed_feed_links_postedBy {
+export interface FeedQuery_feed_links_postedBy {
   __typename: 'User'
   id: string
   name: string
 }
 
-export interface Feed_feed_links_votes_user {
+export interface FeedQuery_feed_links_votes_user {
   __typename: 'User'
   id: string
 }
 
-export interface Feed_feed_links_votes {
+export interface FeedQuery_feed_links_votes {
   __typename: 'Vote'
   id: string
-  user: Feed_feed_links_votes_user
+  user: FeedQuery_feed_links_votes_user
 }
 
-export interface Feed_feed_links {
+export interface FeedQuery_feed_links {
   __typename: 'Link'
   id: string
   createdAt: any
   url: string
   description: string
-  postedBy: Feed_feed_links_postedBy | null
-  votes: Feed_feed_links_votes[]
+  postedBy: FeedQuery_feed_links_postedBy | null
+  votes: FeedQuery_feed_links_votes[]
 }
 
-export interface Feed_feed {
+export interface FeedQuery_feed {
   __typename: 'Feed'
-  links: Feed_feed_links[]
+  links: FeedQuery_feed_links[]
+  count: number
 }
 
-export interface Feed {
-  feed: Feed_feed
+export interface FeedQuery {
+  feed: FeedQuery_feed
+}
+
+export interface FeedQueryVariables {
+  first?: number | null
+  skip?: number | null
+  orderBy?: LinkOrderByInput | null
 }
 
 /* tslint:disable */
@@ -301,6 +308,15 @@ export interface NewVotesSubscription {
 //==============================================================
 // START Enums and Input Objects
 //==============================================================
+
+export enum LinkOrderByInput {
+  createdAt_ASC = 'createdAt_ASC',
+  createdAt_DESC = 'createdAt_DESC',
+  description_ASC = 'description_ASC',
+  description_DESC = 'description_DESC',
+  url_ASC = 'url_ASC',
+  url_DESC = 'url_DESC',
+}
 
 //==============================================================
 // END Enums and Input Objects
