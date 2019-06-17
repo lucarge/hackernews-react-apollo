@@ -2,5 +2,5 @@
   "watch": ["src"],
   "ext": "ts",
   "ignore": ["__tests__", "node_modules"],
-  "exec": "ts-node -r tsconfig-paths/register 'src/index.ts'"
+  "exec": "ts-node -r dotenv/config -r tsconfig-paths/register 'src/index.ts'"
 }

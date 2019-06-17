@@ -6,10 +6,11 @@
   "scripts": {
     "dev:start": "nodemon",
     "prisma": "prisma",
-    "start": "node -r tsconfig-paths/register dist/index.js"
+    "start": "node -r dotenv/config -r tsconfig-paths/register dist/index.js"
   },
   "dependencies": {
     "bcryptjs": "2.4.3",
+    "dotenv": "8.0.0",
     "graphql-yoga": "1.17.4",
     "jsonwebtoken": "8.2.0",
     "prisma-client-lib": "1.31.0"
