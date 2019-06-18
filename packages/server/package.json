@@ -4,9 +4,10 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "dev:start": "nodemon",
-    "prisma": "prisma",
-    "start": "node -r dotenv/config -r tsconfig-paths/register dist/index.js"
+    "build": "tsc -p tsconfig.json",
+    "dev:start": "rm -rf dist && nodemon",
+    "start": "node -r dotenv/config -r tsconfig-paths/register dist/index.js",
+    "prisma": "prisma"
   },
   "dependencies": {
     "bcryptjs": "2.4.3",

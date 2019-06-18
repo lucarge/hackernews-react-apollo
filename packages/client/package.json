@@ -18,10 +18,11 @@
     "typescript": "3.4.5"
   },
   "scripts": {
-    "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "dev:start": "react-scripts start",
+    "start": "serve -s build",
     "eject": "react-scripts eject",
+    "test": "react-scripts test",
     "types:generate": "apollo codegen:generate --config=apollo.config.js --globalTypesFile=src/types/index.ts --outputFlat --target=typescript src/types/index.ts"
   },
   "eslintConfig": {
@@ -47,6 +48,7 @@
     "@types/react-dom": "16.8.4",
     "@types/react-router": "5.0.1",
     "@types/react-router-dom": "4.3.3",
-    "apollo": "2.13.1"
+    "apollo": "2.13.1",
+    "serve": "11.0.1"
   }
 }

@@ -7,17 +7,19 @@
     "esModuleInterop": true,
     "module": "commonjs",
     "moduleResolution": "node",
-    "noEmit": true,
+    "noEmit": false,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "outDir": "dist",
     "paths": {
-      "@src/*": ["src/*"]
+      "@src/*": ["dist/*", "src/*"]
     },
     "removeComments": true,
+    "skipLibCheck": true,
     "sourceMap": false,
     "strict": true,
     "strictBindCallApply": true,
@@ -27,5 +29,6 @@
     "target": "es2018",
     "typeRoots": ["src/types", "../../node_modules/@types"]
   },
-  "exclude": ["node_modules", "**/node_modules/*"]
+  "exclude": ["node_modules", "**/node_modules/*"],
+  "include": ["src/index.ts"]
 }
