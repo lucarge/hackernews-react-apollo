@@ -1,75 +1,30 @@
 import React, { useCallback } from 'react'
-import { Mutation, MutationUpdaterFn } from 'react-apollo'
-import { RouteComponentProps, withRouter } from 'react-router'
+import { useMutation } from 'urql'
 import { VOTE_MUTATION } from 'api/mutations/vote'
-import { FEED_QUERY } from 'api/queries/feed'
-import { FeedQuery, FeedQuery_feed_links, VoteMutation, VoteMutationVariables } from 'types'
-import { getFeedQueryVariables } from 'utils/getFeedQueryVariables'
+import { FeedQuery_feed_links, VoteMutation, VoteMutationVariables } from 'types'
 import { timeDifferenceForDate } from 'utils/timeDifferenceForDate'
 
-type Props = RouteComponentProps<{ page: string }> & {
+type Props = {
   index: number
   link: FeedQuery_feed_links
 }
 
-const LinkComponent = ({ index, location, match, link }: Props) => {
+export const Link = ({ index, link }: Props) => {
   const authToken = localStorage.getItem('auth-token')
+  const [, executeVote] = useMutation<VoteMutation, VoteMutationVariables>(VOTE_MUTATION)
 
-  const handleCacheUpdate: MutationUpdaterFn<VoteMutation> = useCallback(
-    (store, payload) => {
-      const vote = payload.data ? payload.data.vote : undefined
-
-      if (!vote) {
-        return
-      }
-
-      const data = store.readQuery<FeedQuery>({
-        query: FEED_QUERY,
-        variables: getFeedQueryVariables(location, match),
-      })
-
-      if (!data) {
-        return
-      }
-
-      store.writeQuery({
-        query: FEED_QUERY,
-        data: {
-          feed: {
-            ...data.feed,
-            links: data.feed.links.map(currentLink => {
-              if (currentLink.id !== link.id) {
-                return currentLink
-              }
-
-              return {
-                ...currentLink,
-                votes: vote.link.votes,
-              }
-            }),
-          },
-        },
-      })
-    },
-    [link, location, match]
-  )
+  const vote = useCallback(async () => {
+    await executeVote({ linkId: link.id })
+  }, [executeVote, link])
 
   return (
     <div className="flex mt2 items-start">
       <div className="flex items-center">
         <span className="gray">{index + 1}.</span>
         {authToken && (
-          <Mutation<VoteMutation, VoteMutationVariables>
-            mutation={VOTE_MUTATION}
-            update={handleCacheUpdate}
-            variables={{ linkId: link.id }}
-          >
-            {voteMutation => (
-              <button className="ml1 gray f11" onClick={() => voteMutation()}>
-                ▲
-              </button>
-            )}
-          </Mutation>
+          <button className="ml1 gray f11" onClick={vote}>
+            ▲
+          </button>
         )}
       </div>
       <div className="ml1">
@@ -84,7 +39,5 @@ const LinkComponent = ({ index, location, match, link }: Props) => {
     </div>
   )
 }
-
-export const Link = withRouter(LinkComponent)
 
 export default undefined
