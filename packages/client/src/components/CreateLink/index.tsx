@@ -1,49 +1,23 @@
 import React, { useCallback, useState } from 'react'
-import { Mutation, MutationUpdaterFn } from 'react-apollo'
 import { RouteComponentProps } from 'react-router'
-import { FEED_QUERY } from 'api/queries/feed'
+import { useMutation } from 'urql'
 import { POST_MUTATION } from 'api/mutations/post'
-import { PostMutation, PostMutationVariables, FeedQuery } from 'types'
-import { getFeedQueryVariables } from 'utils/getFeedQueryVariables'
+import { PostMutation, PostMutationVariables } from 'types'
 
-export const CreateLink = ({ history, location, match }: RouteComponentProps<{ page: string }>) => {
+export const CreateLink = ({ history }: RouteComponentProps<{ page: string }>) => {
   const [description, setDescription] = useState('')
   const [url, setUrl] = useState('')
+  const [, executePost] = useMutation<PostMutation, PostMutationVariables>(POST_MUTATION)
 
-  const handleCompleted = useCallback(() => {
+  const createLink = useCallback(async () => {
+    const result = await executePost({ description, url })
+
+    if (result.error) {
+      return
+    }
+
     history.push('/')
-  }, [history])
-
-  const handleUpdate: MutationUpdaterFn<PostMutation> = useCallback(
-    (store, payload) => {
-      const post = payload.data ? payload.data.post : undefined
-
-      if (!post) {
-        return
-      }
-
-      const data = store.readQuery<FeedQuery>({
-        query: FEED_QUERY,
-        variables: getFeedQueryVariables(location, match),
-      })
-
-      if (!data) {
-        return
-      }
-
-      store.writeQuery({
-        data: {
-          feed: {
-            ...data.feed,
-            links: [post, ...data.feed.links],
-          },
-        },
-        query: FEED_QUERY,
-        variables: getFeedQueryVariables(location, match),
-      })
-    },
-    [location, match]
-  )
+  }, [description, executePost, history, url])
 
   return (
     <div>
@@ -63,14 +37,7 @@ export const CreateLink = ({ history, location, match }: RouteComponentProps<{ p
           placeholder="The URL for the link"
         />
       </div>
-      <Mutation<PostMutation, PostMutationVariables>
-        mutation={POST_MUTATION}
-        onCompleted={handleCompleted}
-        update={handleUpdate}
-        variables={{ description, url }}
-      >
-        {postMutation => <button onClick={() => postMutation()}>Submit</button>}
-      </Mutation>
+      <button onClick={createLink}>Submit</button>
     </div>
   )
 }

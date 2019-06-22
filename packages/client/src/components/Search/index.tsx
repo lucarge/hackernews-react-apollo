@@ -1,36 +1,31 @@
-import React, { useCallback, useState } from 'react'
-import { withApollo, WithApolloClient } from 'react-apollo'
+import React, { useState } from 'react'
+import { useQuery } from 'urql'
 import { FEED_SEARCH_QUERY } from 'api/queries/feed/search'
 import { Link } from 'components/Link'
-import { FeedSearchQuery, FeedSearchQueryVariables, FeedSearchQuery_feed_links } from 'types'
+import { FeedSearchQuery, FeedSearchQueryVariables } from 'types'
 
-const SearchComponent = ({ client }: WithApolloClient<{}>) => {
+export const Search = () => {
   const [filter, setFilter] = useState('')
-  const [links, setLinks] = useState<FeedSearchQuery_feed_links[]>([])
-
-  const handleSearch = useCallback(async () => {
-    const result = await client.query<FeedSearchQuery, FeedSearchQueryVariables>({
-      query: FEED_SEARCH_QUERY,
-      variables: { filter },
-    })
-
-    setLinks(result.data.feed.links)
-  }, [client, filter, setLinks])
+  const [result, searchLinks] = useQuery<FeedSearchQuery, FeedSearchQueryVariables>({
+    pause: !filter,
+    query: FEED_SEARCH_QUERY,
+    variables: { filter },
+  })
 
   return (
     <div>
       <div>
         Search
         <input type="text" onChange={e => setFilter(e.target.value)} />
-        <button onClick={handleSearch}>OK</button>
+        <button onClick={searchLinks}>OK</button>
       </div>
-      {links.map((link, index) => (
-        <Link key={link.id} link={link} index={index} />
-      ))}
+
+      {result.fetching && <p>loading...</p>}
+      {result.error && <p>failed to search links</p>}
+
+      {result.data && result.data.feed.links.map((link, index) => <Link key={link.id} link={link} index={index} />)}
     </div>
   )
 }
-
-export const Search = withApollo(SearchComponent)
 
 export default undefined
